@@ -4,14 +4,14 @@
 ###
 
 
-def PolBuildout(default,handle):
+def PolBuildout(default,handle,os_num):
     import server_lcp
     import server_scp
     import UUIDSUF
     import extmgt
     import bootpol
-    server_lcp.ServerLCP(default,handle)
-    server_scp.ServerSCP(default,handle)
+    server_lcp.ServerLCP(default,handle,os_num)
+    server_scp.ServerSCP(default,handle,os_num)
     UUIDSUF.UUIDsuffix(default,handle)
     extmgt.ExtMgtPool(default,handle)
     bootpol.bootpol_DVDSDLOCAL(handle)
@@ -56,7 +56,7 @@ def SPTemp_and_BulkSP(handle):
     from ucsmsdk.mometa.fabric.FabricVCon import FabricVCon
     from ucsmsdk.mometa.ls.LsPower import LsPower
 
-    mo = LsServer(parent_mo_or_dn="org-root", ext_ip_state="pooled", ext_ip_pool_name=(extmgt_s), name=("SDK_"+des_str+"_"+os+"_SPTEMP"), boot_policy_name="DVD-SD-Local", ident_pool_name=(uuid_s), local_disk_policy_name="default", type="updating-template")
+    mo = LsServer(parent_mo_or_dn="org-root", ext_ip_state="pooled", ext_ip_pool_name=(extmgt_s), name=("SDK_"+des_str+"_"+osn+"_SPTEMP"), boot_policy_name="DVD-SD-Local", ident_pool_name=(uuid_s), local_disk_policy_name="default", type="updating-template")
     mo_1 = VnicConnDef(parent_mo_or_dn=mo, san_conn_policy_name=(scp_s), lan_conn_policy_name=(lcp_s))
     mo_2 = VnicEther(parent_mo_or_dn=mo, order="4", cdn_source="vnic-name", pin_to_group_name="", cdn_prop_in_sync="yes", qos_policy_name="", admin_cdn_name="", nw_templ_name="", admin_vcon="any", addr="derived", mtu="9000", nw_ctrl_policy_name="", adaptor_profile_name="", name=(nicpolb_s), ident_pool_name="", switch_id="A", stats_policy_name="default", admin_host_port="ANY")
     mo_3 = VnicEther(parent_mo_or_dn=mo, order="3", cdn_source="vnic-name", pin_to_group_name="", cdn_prop_in_sync="yes", qos_policy_name="", admin_cdn_name="", nw_templ_name="", admin_vcon="any", addr="derived", mtu="9000", nw_ctrl_policy_name="", adaptor_profile_name="", name=(nicpola_s), ident_pool_name="", switch_id="A", stats_policy_name="default", admin_host_port="ANY")
@@ -78,30 +78,30 @@ def SPTemp_and_BulkSP(handle):
 
     dn_set = DnSet()
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP1")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP1")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP2")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP2")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP3")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP3")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP4")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP4")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP5")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP5")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP6")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP6")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP7")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP7")
     dn_set.child_add(dn)
     dn = Dn()
-    dn.attr_set("value","SDK_"+des_str+"_"+os+"_SP8")
+    dn.attr_set("value","SDK_"+des_str+"_"+osn+"_SP8")
     dn_set.child_add(dn)
-    elem = ls_instantiate_n_named_template(cookie=handle.cookie, dn=("org-root/ls-SDK_"+des_str+"_"+os+"_SPTEMP"), in_error_on_existing="true", in_name_set=dn_set, in_target_org="org-root", in_hierarchical="false")
+    elem = ls_instantiate_n_named_template(cookie=handle.cookie, dn=("org-root/ls-SDK_"+des_str+"_"+osn+"_SPTEMP"), in_error_on_existing="true", in_name_set=dn_set, in_target_org="org-root", in_hierarchical="false")
     mo_list = handle.process_xml_elem(elem)
 
 
@@ -123,20 +123,26 @@ if __name__ == "__main__":
     admin=input("Enter Admin user name: ")
     pwd=input("Enter password: ")
     default=int(input("Use defaults? yes=1, no=0: "))
-    osnum=int(input("Enter OS index: 1. LNX, 2. WIN, 3. VMW: <only LNX supported right now>:  "))
+    osnum=int(input("Enter OS index: 1. LNX, 2. WIN, 3. VMW:  "))
     desig=int(input("Enter numeric designator for SP Template (0-99):  "))
     des_str=str(desig)
     handle = UcsHandle(ucssys,admin,pwd, port=443)#.format(ucssysf=ucssys,adminf=admin,pwdf=pwd)
     handle.login()
     if osnum==1:
-        os="LNX"
+        osn="LNX"
         os_ad="Linux"
+        os_num=1
+        os_name="Linux"
     if osnum==2:
-        os=="WIN"
+        osn="WIN"
         os_ad="Windows"
+        os_num=2
+        os_name="Windows"
     if osnum==3:
-        os=="VMW"
+        osn="VMW"
         os_ad="VMWare"
+        os_num=3
+        os_name="VMWare"
     if osnum > 3:
         print ("Bad value, exiting...")
         sys.exit()
@@ -145,7 +151,7 @@ if __name__ == "__main__":
         sys.exit()
 
 
-    PolBuildout(default,handle)
+    PolBuildout(default,handle,os_num)
     SPTemp_and_BulkSP(handle)
 
 

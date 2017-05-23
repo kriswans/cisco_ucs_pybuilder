@@ -3,7 +3,7 @@
 ##This program creates a Lan Connectivity Policy and the parameters contained therein. This is for a dual NIC system using jumbo frames
 ###
 
-def ServerLCP(default,handle):
+def ServerLCP(default,handle,os_num):
     from ucsmsdk.ucshandle import UcsHandle
     from ucsmsdk.mometa.macpool.MacpoolPool import MacpoolPool
     from ucsmsdk.mometa.macpool.MacpoolBlock import MacpoolBlock
@@ -105,9 +105,21 @@ def ServerLCP(default,handle):
     from ucsmsdk.mometa.vnic.VnicLanConnPolicy import VnicLanConnPolicy
     from ucsmsdk.mometa.vnic.VnicEther import VnicEther
 
+    if os_num == 1:
+        os_name="Linux"
+    if os_num == 2:
+        os_name="Windows"
+    if os_num == 3:
+        os_name="VMWare"
+    if os_num > 3 or os_num < 1:
+        os_num=1
+        os_name="Linux"
+        print ("Invalid input so selecting Linux as adaptor_profile_name")
+
+
     mo = VnicLanConnPolicy(parent_mo_or_dn="org-root", name=(lcp_s))
-    mo_1 = VnicEther(parent_mo_or_dn=mo, adaptor_profile_name="Linux", switch_id="A-B", nw_templ_name=(nicpola_s), name=(nicpola_s), order="1")
-    mo_2 = VnicEther(parent_mo_or_dn=mo, adaptor_profile_name="Linux", switch_id="B-A", nw_templ_name=(nicpolb_s), name=(nicpolb_s), order="2")
+    mo_1 = VnicEther(parent_mo_or_dn=mo, adaptor_profile_name=(os_name), switch_id="A-B", nw_templ_name=(nicpola_s), name=(nicpola_s), order="1")
+    mo_2 = VnicEther(parent_mo_or_dn=mo, adaptor_profile_name=(os_name), switch_id="B-A", nw_templ_name=(nicpolb_s), name=(nicpolb_s), order="2")
     handle.add_mo(mo)
 
     handle.commit()
@@ -123,10 +135,11 @@ if __name__=="__main__":
         ucssys=input("Enter the IP or hostname: ")
         admin=input("Enter Admin user name: ")
         pwd=input("Enter password: ")
+        os_num=int(input("Enter OS 1=Linux , 2= Windows , 3 =VMWare "))
         default=int(input("Use defaults? yes=1, no=0: "))
         handle = UcsHandle(ucssys,admin,pwd, port=443)#.format(ucssysf=ucssys,adminf=admin,pwdf=pwd)
         handle.login()
     except:
         print("Can't seem to connect")
 
-    ServerLCP(default,handle)
+    ServerLCP(default,handle,os_num)

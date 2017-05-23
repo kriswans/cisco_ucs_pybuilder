@@ -4,7 +4,7 @@
 ###
 
 
-def ServerSCP(default,handle):
+def ServerSCP(default,handle,os_num):
     try:
         from ucsmsdk.ucshandle import UcsHandle
         import sys
@@ -72,11 +72,22 @@ def ServerSCP(default,handle):
         from ucsmsdk.mometa.vnic.VnicFc import VnicFc
         from ucsmsdk.mometa.vnic.VnicFcIf import VnicFcIf
 
+        if os_num == 1:
+            os_name="Linux"
+        if os_num == 2:
+            os_name="Windows"
+        if os_num == 3:
+            os_name="VMWare"
+        if os_num > 3 or os_num < 1:
+            os_num=1
+            os_name="Linux"
+            print ("Invalid input so selecting Linux as adaptor_profile_name")
+
         mo = VnicSanConnPolicy(parent_mo_or_dn="org-root", descr="created from SDK", name=(scp_s))
         mo_1 = VnicFcNode(parent_mo_or_dn=mo, addr="pool-derived", ident_pool_name=(nm_s))
-        mo_2 = VnicFc(parent_mo_or_dn=mo, order="1", nw_templ_name=(tmpa_s), adaptor_profile_name="Linux", name="A")
+        mo_2 = VnicFc(parent_mo_or_dn=mo, order="1", nw_templ_name=(tmpa_s), adaptor_profile_name=(os_name), name="A")
         mo_2_1 = VnicFcIf(parent_mo_or_dn=mo_2, name="default")
-        mo_3 = VnicFc(parent_mo_or_dn=mo, order="2", nw_templ_name=(tmpb_s), adaptor_profile_name="Linux", name="B")
+        mo_3 = VnicFc(parent_mo_or_dn=mo, order="2", nw_templ_name=(tmpb_s), adaptor_profile_name=(os_name), name="B")
         mo_3_1 = VnicFcIf(parent_mo_or_dn=mo_3, name="default")
         handle.add_mo(mo)
 
@@ -93,10 +104,11 @@ if __name__=="__main__":
         ucssys=input("Enter the IP or hostname: ")
         admin=input("Enter Admin user name: ")
         pwd=input("Enter password: ")
+        os_num=int(input("Enter OS 1=Linux , 2= Windows , 3 =VMWare "))
         default=int(input("Use defaults? yes=1, no=0: "))
         handle = UcsHandle(ucssys,admin,pwd, port=443)#.format(ucssysf=ucssys,adminf=admin,pwdf=pwd)
         handle.login()
     except:
         print("Can't seem to connect")
 
-    ServerSCP(default,handle)
+    ServerSCP(default,handle,os_num)

@@ -2,6 +2,7 @@
 #Author: kriswans@cisco.com
 #https://github.com/kriswans/ucs-py-tools
 ###
+import sys
 
 def RestoreAllLast():
     import sys
@@ -28,5 +29,9 @@ if __name__ == "__main__":
         if restore == "L":
             RestoreAllLast()
             print("Success")
+        else:
+            print("Invalid Input")
+            sys.exit()
     except:
+        print("Failed Restore")
         sys.exit()
