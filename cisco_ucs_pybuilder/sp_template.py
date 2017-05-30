@@ -118,6 +118,7 @@ if __name__ == "__main__":
     import time
     import os
     import multiprocessing
+    import config_checker
 
     ucssys=input("Enter the IP or hostname: ")
     admin=input("Enter Admin user name: ")
@@ -164,6 +165,8 @@ if __name__ == "__main__":
     import os
     import time
     import multiprocessing
+
+    config_checker.xmppAcctInfo()
 
     hdn=open("pvt/hdn",'r')
     hdnlist=hdn.readlines()
